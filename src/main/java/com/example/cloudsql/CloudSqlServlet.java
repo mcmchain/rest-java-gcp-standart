@@ -29,8 +29,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
@@ -39,21 +39,107 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentReference;
+// [START fs_include_dependencies]
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.FirestoreOptions;
+// [END fs_include_dependencies]
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.WriteResult;
+import com.google.common.collect.ImmutableMap;
+
+import com.google.gson.JsonArray;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 // [START gae_flex_mysql_app]
 @SuppressWarnings("serial")
 @WebServlet(name = "cloudsql", value = "")
 public class CloudSqlServlet extends HttpServlet {
   Connection conn;
+  private Firestore db;
 
   @Override
-  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException,
-      ServletException {
+  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    //SaveIpsToMySql(req, resp);
+
+    JSONArray jsonListObj = ReadFromFireDB(req, resp);
+    PrintWriter writer = resp.getWriter();
+    resp.setContentType("application/json");
+    writer.print(jsonListObj);
+    writer.flush();
+  }
+
+  @Override
+  public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    SaveIpsToMySql(req, resp);
+    WriteToFireBase(req, resp);
+  }
+
+  private JSONArray ReadFromFireDB(HttpServletRequest req, HttpServletResponse resp)
+  {
+    String username = req.getParameter("username");
+    // [START fs_add_query]
+    // asynchronously query
+    ApiFuture<QuerySnapshot> query = db.collection("users").whereEqualTo("username", username).get();
+    // ...
+    // query.get() blocks on response
+    QuerySnapshot querySnapshot = null;
+    try {
+      querySnapshot = query.get();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    } catch (ExecutionException e) {
+      e.printStackTrace();
+    }
+
+    JSONArray jsonListObj = new JSONArray();
+
+    List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+    for (QueryDocumentSnapshot document : documents) {
+      JSONObject json = new JSONObject();
+      json.put("User", document.getId());
+      json.put("First", document.getString("firstName"));
+
+      System.out.println("First: " + document.getString("firstName"));
+      if (document.contains("last")) {
+        json.put("First", document.getString("firstName"));
+      }
+      json.put("Age", document.getString("age"));
+
+      jsonListObj.add(json);
+    }
+    // [END fs_add_query]
+
+    return jsonListObj;
+  }
+
+
+  private void WriteToFireBase(HttpServletRequest req, HttpServletResponse resp)
+  {
+    String username = req.getParameter("username");
+    String firstName = req.getParameter("firstName");
+    String ageStr = req.getParameter("age");
+    int age = Integer.parseInt(ageStr);
+
+    DocumentReference docRef = db.collection("users").document(username);
+    Map<String, Object> data = new HashMap<>();
+    data.put("FirstName", firstName);
+    data.put("Age", age);
+    //asynchronously write data
+    ApiFuture<WriteResult> result = docRef.set(data);
+  }
+
+
+  private void SaveIpsToMySql(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
     final String createTableSql = "CREATE TABLE IF NOT EXISTS visits ( visit_id INT NOT NULL "
-        + "AUTO_INCREMENT, user_ip VARCHAR(46) NOT NULL, timestamp DATETIME NOT NULL, "
-        + "PRIMARY KEY (visit_id) )";
+            + "AUTO_INCREMENT, user_ip VARCHAR(46) NOT NULL, timestamp DATETIME NOT NULL, "
+            + "PRIMARY KEY (visit_id) )";
     final String createVisitSql = "INSERT INTO visits (user_ip, timestamp) VALUES (?, ?)";
     final String selectSql = "SELECT user_ip, timestamp FROM visits ORDER BY timestamp DESC "
-        + "LIMIT 10";
+            + "LIMIT 10";
 
     String path = req.getRequestURI();
     if (path.startsWith("/favicon.ico")) {
@@ -115,6 +201,11 @@ public class CloudSqlServlet extends HttpServlet {
       try {
         Class.forName("com.mysql.jdbc.Driver");
         conn = DriverManager.getConnection(url);
+
+        Firestore db = FirestoreOptions.getDefaultInstance().getService();
+        // [END fs_initialize]
+        this.db = db;
+
       } catch (ClassNotFoundException e) {
         throw new ServletException("Error loading JDBC Driver", e);
       } catch (SQLException e) {
