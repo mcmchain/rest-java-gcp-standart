@@ -16,7 +16,16 @@
 
 package com.example.cloudsql;
 
+import com.google.api.core.ApiFuture;
 import com.google.common.base.Stopwatch;
+
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.FirestoreOptions;
+
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.WriteResult;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -39,18 +48,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentReference;
-// [START fs_include_dependencies]
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
-// [END fs_include_dependencies]
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.WriteResult;
-import com.google.common.collect.ImmutableMap;
 
-import com.google.gson.JsonArray;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -62,10 +60,11 @@ public class CloudSqlServlet extends HttpServlet {
   private Firestore db;
 
   @Override
-  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+  public void doGet(HttpServletRequest req, HttpServletResponse resp)
+          throws IOException, ServletException {
     //SaveIpsToMySql(req, resp);
 
-    JSONArray jsonListObj = ReadFromFireDB(req, resp);
+    JSONArray jsonListObj = ReadFromFireDb(req, resp);
     PrintWriter writer = resp.getWriter();
     resp.setContentType("application/json");
     writer.print(jsonListObj);
@@ -73,12 +72,13 @@ public class CloudSqlServlet extends HttpServlet {
   }
 
   @Override
-  public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+  public void doPost(HttpServletRequest req, HttpServletResponse resp)
+          throws IOException, ServletException {
     SaveIpsToMySql(req, resp);
     WriteToFireBase(req, resp);
   }
 
-  private JSONArray ReadFromFireDB(HttpServletRequest req, HttpServletResponse resp)
+  private JSONArray ReadFromFireDb(HttpServletRequest req, HttpServletResponse resp)
   {
     String username = req.getParameter("username");
     // [START fs_add_query]
@@ -133,7 +133,8 @@ public class CloudSqlServlet extends HttpServlet {
   }
 
 
-  private void SaveIpsToMySql(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+  private void SaveIpsToMySql(HttpServletRequest req, HttpServletResponse resp)
+          throws IOException, ServletException {
     final String createTableSql = "CREATE TABLE IF NOT EXISTS visits ( visit_id INT NOT NULL "
             + "AUTO_INCREMENT, user_ip VARCHAR(46) NOT NULL, timestamp DATETIME NOT NULL, "
             + "PRIMARY KEY (visit_id) )";
