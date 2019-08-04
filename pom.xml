@@ -16,7 +16,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <packaging>war</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <groupId>com.example.flexible</groupId>
   <artifactId>flexible-cloudsql</artifactId>
 
@@ -47,7 +47,7 @@
 
     <failOnMissingWebXml>false</failOnMissingWebXml> <!-- REQUIRED -->
 
- 
+
 <!-- [END_EXCLUDE] -->
     <sqlURL>jdbc:mysql://google/${database}?cloudSqlInstance=${INSTANCE_CONNECTION_NAME}&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory&amp;user=${user}&amp;password=${password}&amp;useSSL=false</sqlURL>
   </properties>
