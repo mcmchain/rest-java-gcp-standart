@@ -21,12 +21,11 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
-
-import com.google.common.base.Stopwatch;
-
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
+
+import com.google.common.base.Stopwatch;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -52,10 +51,11 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.annotation.WebServlet;
 
+import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -86,12 +86,12 @@ public class CloudSqlServlet extends HttpServlet {
     writeToFireBase(req, resp);
   }
 
-  private JSONArray readFromFireDb(HttpServletRequest req, HttpServletResponse resp)
-  {
+  private JSONArray readFromFireDb(HttpServletRequest req, HttpServletResponse resp) {
     String username = req.getParameter("username");
     // [START fs_add_query]
     // asynchronously query
-    ApiFuture<QuerySnapshot> query = db.collection("users").whereEqualTo("username", username).get();
+    ApiFuture<QuerySnapshot> query =
+            db.collection("users").whereEqualTo("username", username).get();
     // ...
     // query.get() blocks on response
     QuerySnapshot querySnapshot = null;
@@ -125,8 +125,7 @@ public class CloudSqlServlet extends HttpServlet {
   }
 
 
-  private void writeToFireBase(HttpServletRequest req, HttpServletResponse resp)
-  {
+  private void writeToFireBase(HttpServletRequest req, HttpServletResponse resp) {
     String username = req.getParameter("username");
     String firstName = req.getParameter("firstName");
     String ageStr = req.getParameter("age");
