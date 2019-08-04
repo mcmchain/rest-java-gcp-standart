@@ -38,15 +38,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.*;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
-import javax.servlet.ServletException;
+
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
 
 
 import org.json.simple.JSONArray;
@@ -62,9 +68,9 @@ public class CloudSqlServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp)
           throws IOException, ServletException {
-    //SaveIpsToMySql(req, resp);
+    //saveIpsToMySql(req, resp);
 
-    JSONArray jsonListObj = ReadFromFireDb(req, resp);
+    JSONArray jsonListObj = readFromFireDb(req, resp);
     PrintWriter writer = resp.getWriter();
     resp.setContentType("application/json");
     writer.print(jsonListObj);
@@ -74,11 +80,11 @@ public class CloudSqlServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest req, HttpServletResponse resp)
           throws IOException, ServletException {
-    SaveIpsToMySql(req, resp);
-    WriteToFireBase(req, resp);
+    saveIpsToMySql(req, resp);
+    writeToFireBase(req, resp);
   }
 
-  private JSONArray ReadFromFireDb(HttpServletRequest req, HttpServletResponse resp)
+  private JSONArray readFromFireDb(HttpServletRequest req, HttpServletResponse resp)
   {
     String username = req.getParameter("username");
     // [START fs_add_query]
@@ -117,7 +123,7 @@ public class CloudSqlServlet extends HttpServlet {
   }
 
 
-  private void WriteToFireBase(HttpServletRequest req, HttpServletResponse resp)
+  private void writeToFireBase(HttpServletRequest req, HttpServletResponse resp)
   {
     String username = req.getParameter("username");
     String firstName = req.getParameter("firstName");
@@ -133,7 +139,7 @@ public class CloudSqlServlet extends HttpServlet {
   }
 
 
-  private void SaveIpsToMySql(HttpServletRequest req, HttpServletResponse resp)
+  private void saveIpsToMySql(HttpServletRequest req, HttpServletResponse resp)
           throws IOException, ServletException {
     final String createTableSql = "CREATE TABLE IF NOT EXISTS visits ( visit_id INT NOT NULL "
             + "AUTO_INCREMENT, user_ip VARCHAR(46) NOT NULL, timestamp DATETIME NOT NULL, "
