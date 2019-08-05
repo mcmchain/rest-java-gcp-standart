@@ -114,14 +114,18 @@
     <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>2.3</version>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>9.4.10.v20180503</version>
+        <configuration>
+          <scanIntervalSeconds>1</scanIntervalSeconds>
+        </configuration>
       </plugin>
+      <!-- Only required for AppEngine Deployments -->
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>appengine-maven-plugin</artifactId>
-        <version>${appengine-maven-plugin-version}</version>
+        <version>1.3.2</version>
       </plugin>
     </plugins>
   </build>
