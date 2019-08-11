@@ -84,8 +84,15 @@ public class CloudSqlServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest req, HttpServletResponse resp)
           throws IOException, ServletException {
+
+    JSONArray jsonListObj = null;
+
     saveIpsToMySql(req, resp);
-    writeToFireBase(req, resp);
+    jsonListObj = writeToFireBase(req, resp);
+    PrintWriter writer = resp.getWriter();
+    resp.setContentType("application/json");
+    writer.print(jsonListObj);
+    writer.flush();
   }
 
   private JSONArray readFromFireDb(HttpServletRequest req, HttpServletResponse resp) throws ExecutionException, InterruptedException {
@@ -110,14 +117,12 @@ public class CloudSqlServlet extends HttpServlet {
 
       jsonListObj.add(json);
     }
-
-
-      // [END fs_add_query]
+    // [END fs_add_query]
     return jsonListObj;
   }
 
 
-  private void writeToFireBase(HttpServletRequest req, HttpServletResponse resp) {
+  private JSONArray writeToFireBase(HttpServletRequest req, HttpServletResponse resp) {
     String username = req.getParameter("userId");
     String firstName = req.getParameter("firstName");
     String ageStr = req.getParameter("age");
@@ -129,6 +134,9 @@ public class CloudSqlServlet extends HttpServlet {
     data.put("Age", age);
     //asynchronously write data
     ApiFuture<WriteResult> result = docRef.set(data);
+
+    JSONArray jsonListObj = new JSONArray();
+    return jsonListObj;
   }
 
 
