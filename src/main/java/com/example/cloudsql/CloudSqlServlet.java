@@ -89,7 +89,7 @@ public class CloudSqlServlet extends HttpServlet {
   }
 
   private JSONArray readFromFireDb(HttpServletRequest req, HttpServletResponse resp) throws ExecutionException, InterruptedException {
-    String username = req.getParameter("username");
+    String username = req.getParameter("userId");
     // [START fs_add_query]
     // asynchronously query
     DocumentReference docRef = db.collection("users").document(username);
@@ -99,14 +99,13 @@ public class CloudSqlServlet extends HttpServlet {
     JSONArray jsonListObj = new JSONArray();
     if (document.exists()) {
       JSONObject json = new JSONObject();
-      json.put("User", document.getId());
-      json.put("First", document.getString("firstName"));
+      json.put("UserId", document.getId());
+      json.put("FirstName", document.getString("FirstName"));
 
-      System.out.println("First: " + document.getString("firstName"));
-      if (document.contains("last")) {
-        json.put("First", document.getString("firstName"));
+      if (document.contains("LastName")) {
+        json.put("LastName", document.getString("LastName"));
       }
-      json.put("Age", document.getString("age"));
+      json.put("Age", document.getString("Age"));
 
       jsonListObj.add(json);
     }
@@ -116,7 +115,7 @@ public class CloudSqlServlet extends HttpServlet {
 
 
   private void writeToFireBase(HttpServletRequest req, HttpServletResponse resp) {
-    String username = req.getParameter("username");
+    String username = req.getParameter("userId");
     String firstName = req.getParameter("firstName");
     String ageStr = req.getParameter("age");
     int age = Integer.parseInt(ageStr);
