@@ -97,6 +97,7 @@ public class CloudSqlServlet extends HttpServlet {
     DocumentSnapshot document = future.get();
 
     JSONArray jsonListObj = new JSONArray();
+    /*
     if (document.exists()) {
       JSONObject json = new JSONObject();
       json.put("UserId", document.getId());
@@ -109,6 +110,8 @@ public class CloudSqlServlet extends HttpServlet {
 
       jsonListObj.add(json);
     }
+    
+     */
       // [END fs_add_query]
     return jsonListObj;
   }
