@@ -1,20 +1,8 @@
 /*
- * Copyright 2016 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 
-package com.example.cloudsql;
+
+package com.example.flutter.service;
 
 import com.google.api.core.ApiFuture;
 
@@ -55,10 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-// [START gae_flex_mysql_app]
-@SuppressWarnings("serial")
-//@WebServlet(name = "cloudsql", value = "")
-public class CloudSqlServlet extends HttpServlet {
+public class DemoServlet extends HttpServlet {
   Connection conn;
   private Firestore db;
 
@@ -97,7 +82,6 @@ public class CloudSqlServlet extends HttpServlet {
 
   private JSONArray readFromFireDb(HttpServletRequest req, HttpServletResponse resp) throws ExecutionException, InterruptedException {
     String username = req.getParameter("userId");
-    // [START fs_add_query]
     // asynchronously query
     DocumentReference docRef = db.collection("users").document(username);
     ApiFuture<DocumentSnapshot> future = docRef.get();
@@ -117,7 +101,6 @@ public class CloudSqlServlet extends HttpServlet {
 
       jsonListObj.add(json);
     }
-    // [END fs_add_query]
     return jsonListObj;
   }
 
@@ -226,4 +209,3 @@ public class CloudSqlServlet extends HttpServlet {
     }
   }
 }
-// [END gae_flex_mysql_app]
