@@ -166,7 +166,7 @@ public class CloudSqlServlet extends HttpServlet {
       statementCreateVisit.setString(1, userIp);
       statementCreateVisit.setTimestamp(2, new Timestamp(new Date().getTime()));
       statementCreateVisit.executeUpdate();
-
+      /*
       try (ResultSet rs = conn.prepareStatement(selectSql).executeQuery()) {
         stopwatch.stop();
         out.print("Last 10 visits:\n");
@@ -177,6 +177,7 @@ public class CloudSqlServlet extends HttpServlet {
         }
         out.println("Elapsed: " + stopwatch.elapsed(TimeUnit.MILLISECONDS));
       }
+       */
     } catch (SQLException e) {
       throw new ServletException("SQL error", e);
     }
