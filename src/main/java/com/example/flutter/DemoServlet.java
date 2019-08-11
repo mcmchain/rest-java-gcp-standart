@@ -2,7 +2,7 @@
  */
 
 
-package com.example.flutter.service;
+package com.example.flutter;
 
 import com.google.api.core.ApiFuture;
 
@@ -195,7 +195,6 @@ public class DemoServlet extends HttpServlet {
         conn = DriverManager.getConnection(url);
 
         Firestore db = FirestoreOptions.getDefaultInstance().getService();
-        // [END fs_initialize]
         this.db = db;
 
       } catch (ClassNotFoundException e) {
