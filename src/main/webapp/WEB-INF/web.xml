@@ -5,7 +5,6 @@
 
 
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
-
     <servlet>
         <servlet-name>cloudsql</servlet-name>
         <servlet-class>com.example.cloudsql.CloudSqlServlet</servlet-class>
@@ -18,5 +17,4 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-
 </web-app>
