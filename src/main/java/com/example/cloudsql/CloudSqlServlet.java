@@ -62,7 +62,7 @@ import org.json.simple.JSONObject;
 
 // [START gae_flex_mysql_app]
 @SuppressWarnings("serial")
-@WebServlet(name = "cloudsql", value = "")
+//@WebServlet(name = "cloudsql", value = "")
 public class CloudSqlServlet extends HttpServlet {
   Connection conn;
   private Firestore db;
