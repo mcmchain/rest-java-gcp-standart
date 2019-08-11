@@ -18,12 +18,7 @@ package com.example.cloudsql;
 
 import com.google.api.core.ApiFuture;
 
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.WriteResult;
+import com.google.cloud.firestore.*;
 
 import com.google.common.base.Stopwatch;
 
@@ -72,7 +67,14 @@ public class CloudSqlServlet extends HttpServlet {
           throws IOException, ServletException {
     //saveIpsToMySql(req, resp);
 
-    JSONArray jsonListObj = readFromFireDb(req, resp);
+    JSONArray jsonListObj = null;
+    try {
+      jsonListObj = readFromFireDb(req, resp);
+    } catch (ExecutionException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
     PrintWriter writer = resp.getWriter();
     resp.setContentType("application/json");
     writer.print(jsonListObj);
@@ -86,27 +88,16 @@ public class CloudSqlServlet extends HttpServlet {
     writeToFireBase(req, resp);
   }
 
-  private JSONArray readFromFireDb(HttpServletRequest req, HttpServletResponse resp) {
+  private JSONArray readFromFireDb(HttpServletRequest req, HttpServletResponse resp) throws ExecutionException, InterruptedException {
     String username = req.getParameter("username");
     // [START fs_add_query]
     // asynchronously query
-    ApiFuture<QuerySnapshot> query =
-            db.collection("users").whereEqualTo("username", username).get();
-    // ...
-    // query.get() blocks on response
-    QuerySnapshot querySnapshot = null;
-    try {
-      querySnapshot = query.get();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (ExecutionException e) {
-      e.printStackTrace();
-    }
+    DocumentReference docRef = db.collection("users").document(username);
+    ApiFuture<DocumentSnapshot> future = docRef.get();
+    DocumentSnapshot document = future.get();
 
     JSONArray jsonListObj = new JSONArray();
-
-    List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
-    for (QueryDocumentSnapshot document : documents) {
+    if (document.exists()) {
       JSONObject json = new JSONObject();
       json.put("User", document.getId());
       json.put("First", document.getString("firstName"));
@@ -119,8 +110,7 @@ public class CloudSqlServlet extends HttpServlet {
 
       jsonListObj.add(json);
     }
-    // [END fs_add_query]
-
+      // [END fs_add_query]
     return jsonListObj;
   }
 
